@@ -1,6 +1,7 @@
 services:
   fsd:
     image: ghcr.io/renorris/openfsd:fsd-latest
+    pull_policy: never
     restart: unless-stopped
     ports:
       - 6809:6809/tcp
@@ -12,6 +13,7 @@ services:
 
   web:
     image: ghcr.io/renorris/openfsd:web-latest
+    pull_policy: never
     restart: unless-stopped
     environment:
       DATABASE_SOURCE_NAME: /db/openfsd.db?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)
@@ -21,6 +23,7 @@ services:
 
   caddy:
     image: caddy:2
+    pull_policy: missing
     restart: unless-stopped
     depends_on:
       - web

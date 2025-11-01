@@ -1,7 +1,7 @@
 # Builder layer
 FROM golang:1.24 AS build
 
-WORKDIR /go/src/fsdweb
+WORKDIR /go/src/app
 
 # Download dependencies
 COPY go.mod go.sum ./
@@ -12,8 +12,9 @@ RUN go mod download
 COPY . .
 
 ENV GOCACHE=/root/.cache/go-build
-ENV GO_ENABLED=0
-RUN --mount=type=cache,target="/root/.cache/go-build" cd web && go build -o /go/bin/fsdweb
+ENV CGO_ENABLED=0
+# Build from the web directory where the embed directives are
+RUN --mount=type=cache,target="/root/.cache/go-build" cd web && go build -o /go/bin/fsdweb .
 
 # Runner layer
 FROM alpine:latest
