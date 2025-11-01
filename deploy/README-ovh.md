@@ -41,9 +41,55 @@ docker compose -f docker-compose.ovh.yml up -d
 
 ## Configuration initiale
 
-1. Aller sur l'interface Web, se connecter avec l'admin par défaut (imprimé dans les logs du conteneur `fsd` au premier démarrage)
-2. Définir le `API_SERVER_BASE_URL` dans la configuration: `https://$OPENFSD_DOMAIN`
-3. (Optionnel) passer en PostgreSQL si souhaité (voir section suivante)
+### 1. Récupérer les identifiants administrateur
+
+Au premier démarrage, le serveur FSD crée un compte administrateur par défaut avec CID=1. Le mot de passe est affiché dans les logs :
+
+```bash
+# Méthode 1 : Script fourni
+chmod +x get-admin-password.sh
+./get-admin-password.sh
+
+# Méthode 2 : Commande directe
+docker logs deploy-fsd-1 2>&1 | grep -A 10 "DEFAULT ADMINISTRATOR CREDENTIALS"
+```
+
+Vous verrez quelque chose comme :
+```
+DEFAULT ADMINISTRATOR CREDENTIALS:
+CID:      1
+Password: a1b2c3d4e5f6g7h8
+```
+
+**Important** : Ce mot de passe n'apparaît qu'une seule fois au premier démarrage. Notez-le immédiatement.
+
+### 2. Se connecter à l'interface Web
+
+1. Ouvrez `https://$OPENFSD_DOMAIN` (ou l'URL de votre VPS)
+2. Connectez-vous avec :
+   - CID : `1`
+   - Password : celui récupéré ci-dessus
+3. Allez dans **Configure Server**
+4. Définissez `API_SERVER_BASE_URL` = `https://votre-domaine.com`
+
+### 3. (Optionnel) Passer en PostgreSQL
+
+Voir la section dédiée ci-dessous.
+
+---
+
+## Si vous avez perdu le mot de passe admin
+
+**Option 1 : Recréer la base (⚠️ supprime toutes les données)**
+```bash
+docker compose -f docker-compose.ovh.yml down -v
+docker compose -f docker-compose.ovh.yml up -d
+# Les nouveaux identifiants seront dans les logs
+```
+
+**Option 2 : Réinitialiser via un autre admin**
+
+Si vous avez un autre compte administrateur, utilisez l'API pour réinitialiser le mot de passe du CID 1.
 
 ## Basculer en PostgreSQL (optionnel)
 
