@@ -13,7 +13,7 @@
 	}
 
 	# Security headers (redundant with app, but safe)
-	headers {
+	header {
 		X-Frame-Options "DENY"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "no-referrer"
