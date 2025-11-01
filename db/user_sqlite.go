@@ -49,7 +49,7 @@ func (r *SQLiteUserRepository) GetUserByCID(cid int) (user *User, err error) {
 		cid, password, first_name, 
 		last_name, network_rating
 		FROM users
-		WHERE cid = $1`,
+		WHERE cid = ?`,
 		cid,
 	)
 	if err = row.Err(); err != nil {

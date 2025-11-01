@@ -36,7 +36,7 @@ func (s *Server) setupRoutes() (e *gin.Engine) {
 func (s *Server) authMiddleware(c *gin.Context) {
 	authHeader, found := strings.CutPrefix(c.GetHeader("Authorization"), "Bearer ")
 	if !found {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (s *Server) authMiddleware(c *gin.Context) {
 
 	accessToken, err := ParseJwtToken(authHeader, []byte(jwtSecret))
 	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
