@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 ENV GOCACHE=/root/.cache/go-build
-ENV GO_ENABLED=0
+ENV CGO_ENABLED=0
 RUN --mount=type=cache,target="/root/.cache/go-build" cd web && go build -o /go/bin/fsdweb
 
 # Runner layer

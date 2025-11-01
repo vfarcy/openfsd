@@ -15,6 +15,8 @@ var staticFS embed.FS
 func (s *Server) setupRoutes() (e *gin.Engine) {
 	e = gin.New()
 	e.Use(gin.Recovery())
+	// Set security headers for all responses
+	e.Use(securityHeaders())
 	if os.Getenv("GIN_LOGGER") != "" {
 		e.Use(gin.Logger())
 	}

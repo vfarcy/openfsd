@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  fsd:
+    image: ghcr.io/renorris/openfsd:fsd-latest
+    restart: unless-stopped
+    environment:
+      # Use SQLite by default; persisted in the named volume
+      DATABASE_SOURCE_NAME: /db/openfsd.db?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)
+      DATABASE_AUTO_MIGRATE: "true"
+      # Optional: enable debug logs
+      # LOG_DEBUG: "true"
+    volumes:
+      - openfsd_db:/db
+    networks:
+      - openfsd_net
+    ports:
+      # Public FSD TCP port
+      - "6809:6809/tcp"
+
+  web:
+    image: ghcr.io/renorris/openfsd:web-latest
+    depends_on:
+      - fsd
+    restart: unless-stopped
+    environment:
+      DATABASE_SOURCE_NAME: /db/openfsd.db?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)
+      FSD_HTTP_SERVICE_ADDRESS: http://fsd:13618
+      # LISTEN_ADDR defaults to :8000
+      # Optionally enable request logs
+      # GIN_LOGGER: "1"
+    volumes:
+      - openfsd_db:/db
+    networks:
+      - openfsd_net
+    expose:
+      - "8000"
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      OPENFSD_DOMAIN: ${OPENFSD_DOMAIN}
+      EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - openfsd_net
+
+volumes:
+  openfsd_db:
+  caddy_data:
+  caddy_config:
+
+networks:
+  openfsd_net:
+    driver: bridge

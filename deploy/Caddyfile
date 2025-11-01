@@ -1,0 +1,22 @@
+{
+	email {$EMAIL}
+	# Optional: force HTTPS for all sites
+	# auto_https disable_redirects
+}
+
+{$OPENFSD_DOMAIN} {
+	encode zstd gzip
+	log
+	# Proxy the Web UI and API
+	reverse_proxy web:8000 {
+		header_up X-Forwarded-Proto https
+	}
+
+	# Security headers (redundant with app, but safe)
+	headers {
+		X-Frame-Options "DENY"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+	}
+}
