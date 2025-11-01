@@ -1,0 +1,11 @@
+{
+	# Optional but recommended: set your ACME account email
+	email {$ACME_EMAIL}
+}
+
+# Automatic HTTPS with HTTP->HTTPS redirection for your domain
+{$DOMAIN} {
+	encode gzip
+	# Proxy all traffic to the web service inside the compose network
+	reverse_proxy web:8000
+}

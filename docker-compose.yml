@@ -13,13 +13,29 @@ services:
   web:
     image: ghcr.io/renorris/openfsd:web-latest
     restart: unless-stopped
-    ports:
-      - 8000:8000/tcp
     environment:
       DATABASE_SOURCE_NAME: /db/openfsd.db?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)
       FSD_HTTP_SERVICE_ADDRESS: http://fsd:13618
     volumes:
       - db:/db
 
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
 volumes:
   db:
+  caddy_data:
+  caddy_config:
