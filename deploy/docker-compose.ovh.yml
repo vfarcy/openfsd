@@ -33,8 +33,8 @@ services:
       - openfsd_db:/db
     networks:
       - openfsd_net
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
 
   caddy:
     image: caddy:2.8-alpine
